@@ -1,0 +1,24 @@
+version = 0.1
+
+[default.deploy.parameters]
+region = "mx-central-1"
+
+[dev.deploy.parameters]
+# Unique stack name per environment to avoid collisions
+stack_name = "orderui-dev"
+resolve_s3 = true
+s3_prefix = "orderui-dev"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides = "Stage=\"dev\""
+
+[prd.deploy.parameters]
+# Unique stack name per environment to avoid collisions
+stack_name = "orderui-prd"
+resolve_s3 = true
+s3_prefix = "orderui-prd"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides = "Stage=\"prd\""
