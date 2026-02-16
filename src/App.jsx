@@ -1,5 +1,6 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useAuth } from "react-oidc-context";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -32,23 +33,28 @@ export default function App() {
     setItems(items.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
-  const payload = { customerId: String(customerId), items: items.map(i => ({
-    productId: String(i.productId),
-    quantity: Number(i.quantity),
-    price: Number(i.price)
-  })) };
+  const payload = {
+    customerId: String(customerId), items: items.map(i => ({
+      productId: String(i.productId),
+      quantity: Number(i.quantity),
+      price: Number(i.price)
+    }))
+  };
 
-  const addOrder = async (prevState, formData) => {
+  async function addOrder() {
     setResponse(null);
 
     try {
       if (!apiUrl) throw new Error('Please enter the API URL to POST to.');
+      // use ID token (JWT) for API Gateway JWT authorizer
+      const token = auth.user?.id_token;
       const res = await fetch(apiUrl, {
         method: 'POST',
         mode: 'cors', // ensure cross-origin requests
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : undefined
         },
         body: JSON.stringify(payload)
       });
@@ -74,11 +80,60 @@ export default function App() {
     message: "",
     success: false,
   };
-  
+
   const [state, formAction, isPending] = useActionState(addOrder, initialState);
-  
+
+  const auth = useAuth();
+
+  const signOutRedirect = async () => {
+    await auth.removeUser();
+
+    const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN || "https://orderapi-dev-auth.auth.mx-central-1.amazoncognito.com";
+	const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID || "gufujh45flp7jo0c58lqvp78s";
+    const logoutUri = import.meta.env.VITE_CALLBACK_URL || "http://localhost:5173";
+    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+  };
+
+  switch (auth.activeNavigator) {
+    case "signinSilent":
+      return <div>Signing you in...</div>;
+    case "signoutRedirect":
+      return <div>Signing you out...</div>;
+  }
+
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Oops... {auth.error.source} caused {auth.error.message}</div>;
+  }
+
+  if (!auth.isAuthenticated) {
+    return <button onClick={() => auth.signinRedirect()}>Log in</button>;
+  }
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 800, margin: '2rem auto', padding: '1rem' }}>
+      <div>
+        Hello {auth.user?.profile.sub}{" "}
+        <button onClick={() => signOutRedirect()}>Log out</button>
+      </div>
+
+      {/* Debug panel */}
+      <div style={{ border: '1px dashed #bbb', padding: '.5rem', marginTop: '.5rem', fontSize: '.9rem' }}>
+        <div><strong>API URL</strong>: {apiUrl}</div>
+        <div><strong>Auth</strong>: {auth.isAuthenticated ? 'authenticated' : 'unauthenticated'}</div>
+        {auth.user && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.25rem', marginTop: '.25rem' }}>
+            <div>issuer: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return p.iss; } catch { return 'n/a'; } })()}</div>
+            <div>audience: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return Array.isArray(p.aud) ? p.aud.join(',') : p.aud; } catch { return 'n/a'; } })()}</div>
+            <div>expires: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return new Date(p.exp * 1000).toISOString(); } catch { return 'n/a'; } })()}</div>
+            <div>has token: {auth.user?.id_token ? 'yes' : 'no'}</div>
+          </div>
+        )}
+      </div>
+
       <h1>Order Submitter</h1>
       <p>Enter order details and POST them to your REST endpoint.</p>
 
@@ -168,7 +223,7 @@ export default function App() {
         {isPending ? "Loading..." : state.message}
 
         {state.message && (
-          <div style={{ marginTop: '1rem', color: state.success? '#a00' : 'red' }}>
+          <div style={{ marginTop: '1rem', color: state.success ? '#a00' : 'red' }}>
             {state.message}
           </div>
         )}
