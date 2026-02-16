@@ -5,8 +5,9 @@ import { useAuth, withAuth } from "react-oidc-context";
 const OrderForm = () => {
   const auth = useAuth();
 
-  const addOrder = async () => {
+  const addOrder = async (prevState, formData) => {
     setResponse(null);
+	console.log(formData.get("customerId"));
     try {
       if (!apiUrl) throw new Error('Please enter the API URL to POST to.');
       const token = auth.user?.id_token;
@@ -83,6 +84,7 @@ const OrderForm = () => {
           <span>Customer ID</span>
           <input
             type="text"
+			name="customerId"
             value={customerId}
             onChange={(e) => setCustomerId(e.target.value)}
             min={1}
