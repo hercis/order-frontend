@@ -84,7 +84,7 @@ const OrderForm = () => {
           <span>Customer ID</span>
           <input
             type="text"
-			name="customerId"
+            name="customerId"
             value={customerId}
             onChange={(e) => setCustomerId(e.target.value)}
             min={1}
