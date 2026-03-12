@@ -1,0 +1,53 @@
+#container_form {
+	max-width: 800px;
+	margin: 2rem auto; /* centers content */
+	padding: 1rem;
+}
+
+#container_form form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+#container_form label {
+	display: flex;
+	flex-direction: column;
+	gap: .25rem;
+	width: 100%;
+}
+
+#container_add_item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#container_add_item h2 {
+	margin: 0;
+}
+
+#container_items {
+	display: flex;
+	flex-direction: column;
+	gap: .75rem;
+	margin-top: .5rem;
+}
+
+.item_row {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: .75rem;
+	display: grid;
+	gap: .5rem;
+}
+
+#container_item_fields {
+	display: flex;
+	gap: .75rem;
+	justify-content: space-between;
+}
+
+#item_remove_button {
+	align-self: flex-end;
+}
