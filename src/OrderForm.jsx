@@ -1,6 +1,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useAuth } from "react-oidc-context";
+import './OrderForm.css';
 
 const OrderForm = () => {
   const auth = useAuth();
@@ -64,12 +65,12 @@ const OrderForm = () => {
   };
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 800, margin: '2rem auto', padding: '1rem' }}>
+    <div id="container_form">
       <h1>Order Submitter</h1>
       <p>Enter order details.</p>
 
-      <form action={formAction} style={{ display: 'grid', gap: '1rem' }}>
-        <label style={{ display: 'grid', gap: '.25rem' }}>
+      <form action={formAction}>
+        <label>
           <span>API URL</span>
           <input
             type="text"
@@ -80,7 +81,7 @@ const OrderForm = () => {
           />
         </label>
 
-        <label style={{ display: 'grid', gap: '.25rem' }}>
+        <label>
           <span>Customer ID</span>
           <input
             type="text"
@@ -94,8 +95,8 @@ const OrderForm = () => {
 
         <ItemTable items={items} setItems={setItems} />
 
-        <div style={{ display: 'grid', gap: '.5rem' }}>
-          <label style={{ display: 'grid', gap: '.25rem' }}>
+        <div>
+          <label>
             <span>Request Payload (read-only)</span>
             <textarea readOnly rows={8} value={JSON.stringify(payload, null, 2)} />
           </label>
@@ -149,17 +150,17 @@ const ItemTable = ({ items, setItems }) => {
   return (
     <>
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>Items</h2>
+        <div id="container_add_item">
+          <h2>Items</h2>
           <button type="button" onClick={addItem}>+ Add Item</button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '.75rem', marginTop: '.5rem' }}>
+      <div id="container_items">
         {items.map((item, idx) => (
-          <div key={idx} style={{ border: '1px solid #ddd', borderRadius: 8, padding: '.75rem', display: 'grid', gap: '.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '.5rem', alignItems: 'end' }}>
-              <label style={{ display: 'grid', gap: '.25rem' }}>
+          <div key={idx} className="item_row">
+            <div id="container_item_fields">
+              <label>
                 <span>Product ID</span>
                 <input
                   type="text"
@@ -169,7 +170,7 @@ const ItemTable = ({ items, setItems }) => {
                 />
               </label>
 
-              <label style={{ display: 'grid', gap: '.25rem' }}>
+              <label>
                 <span>Quantity</span>
                 <input
                   type="number"
@@ -180,7 +181,7 @@ const ItemTable = ({ items, setItems }) => {
                 />
               </label>
 
-              <label style={{ display: 'grid', gap: '.25rem' }}>
+              <label>
                 <span>Price</span>
                 <input
                   type="number"
@@ -192,7 +193,7 @@ const ItemTable = ({ items, setItems }) => {
                 />
               </label>
 
-              <button type="button" onClick={() => removeItem(idx)} style={{ alignSelf: 'end' }}>
+              <button id="item_remove_button" type="button" onClick={() => removeItem(idx)}>
                 Remove
               </button>
             </div>

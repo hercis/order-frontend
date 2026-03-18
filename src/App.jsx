@@ -1,5 +1,6 @@
 import { useAuth, withAuth } from "react-oidc-context";
 import OrderForm from "./OrderForm.jsx";
+import './App.css';
 
 export default function App() {
   const auth = useAuth();
@@ -39,21 +40,25 @@ export default function App() {
       </div>
       {/* withAuth injects auth prop, so no need to pass manually */}
       <DebugPanel />
-	  <OrderForm />
+      <OrderForm />
     </>
   );
 }
 
 // Convert DebugPanel to receive injected auth via withAuth
 const DebugPanelBase = ({ auth }) => {
-  return (<div style={{ border: '1px dashed #bbb', padding: '.5rem', marginTop: '.5rem', fontSize: '.9rem' }}>
+  return (<div id="debug_panel">
     <div><strong>Auth</strong>: {auth.isAuthenticated ? 'authenticated' : 'unauthenticated'}</div>
     {auth.user && (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.25rem', marginTop: '.25rem' }}>
-        <div>issuer: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return p.iss; } catch { return 'n/a'; } })()}</div>
-        <div>audience: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return Array.isArray(p.aud) ? p.aud.join(',') : p.aud; } catch { return 'n/a'; } })()}</div>
-        <div>expires: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return new Date(p.exp * 1000).toISOString(); } catch { return 'n/a'; } })()}</div>
-        <div>has token: {auth.user?.id_token ? 'yes' : 'no'}</div>
+      <div id="container_auth_details">
+        <div>
+          <div>issuer: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return p.iss; } catch { return 'n/a'; } })()}</div>
+          <div>expires: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return new Date(p.exp * 1000).toISOString(); } catch { return 'n/a'; } })()}</div>
+        </div>
+        <div>
+          <div>audience: {(() => { try { const p = JSON.parse(atob(auth.user.id_token.split('.')[1])); return Array.isArray(p.aud) ? p.aud.join(',') : p.aud; } catch { return 'n/a'; } })()}</div>
+          <div>has token: {auth.user?.id_token ? 'yes' : 'no'}</div>
+        </div>
       </div>
     )}
   </div>

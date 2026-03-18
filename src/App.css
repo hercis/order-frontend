@@ -1,0 +1,12 @@
+#debug_panel {
+	border: 1px dashed #bbb;
+	padding: .5rem;
+	margin-top: .5rem;
+	font-size: .9rem;
+}
+
+#container_auth_details{
+	display: flex;
+	gap: 1rem;
+	margin-top: .25rem
+}
